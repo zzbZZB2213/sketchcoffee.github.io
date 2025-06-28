@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香浓咖啡馆 - 点单系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #8B4513, #CD853F);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .menu-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #8B4513;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: #CD853F;
+            border-radius: 2px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .menu-item {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .menu-item:hover {
+            border-color: #CD853F;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .item-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #8B4513;
+        }
+
+        .item-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .item-price {
+            font-size: 1.4em;
+            color: #D2691E;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .quantity-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .quantity-btn {
+            background: #8B4513;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #A0522D;
+        }
+
+        .quantity-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .quantity-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .add-to-cart {
+            background: linear-gradient(45deg, #228B22, #32CD32);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .add-to-cart:hover {
+            background: linear-gradient(45deg, #32CD32, #228B22);
+            transform: scale(1.05);
+        }
+
+        .cart-section {
+            position: sticky;
+            top: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .cart-title {
+            font-size: 1.5em;
+            color: #8B4513;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .cart-item-details {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .cart-item-quantity {
+            margin: 0 15px;
+            font-weight: bold;
+        }
+
+        .cart-item-price {
+            color: #D2691E;
+            font-weight: bold;
+        }
+
+        .remove-item {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #8B4513;
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 1.8em;
+            color: #8B4513;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .clear-cart, .print-order {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-cart {
+            background: #dc3545;
+            color: white;
+        }
+
+        .clear-cart:hover {
+            background: #c82333;
+        }
+
+        .print-order {
+            background: #007bff;
+            color: white;
+        }
+
+        .print-order:hover {
+            background: #0056b3;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-section, .print-section * {
+                visibility: visible;
+            }
+            .print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>☕ 香浓咖啡馆</h1>
+            <p>新鲜现磨，品质保证</p>
+        </div>
+
+        <div class="menu-section">
+            <div class="section-title">☕ 精品咖啡</div>
+            <div class="menu-grid" id="coffee-menu">
+                <!-- 咖啡菜单项将由JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="section-title">🥤 特色饮品</div>
+            <div class="menu-grid" id="drinks-menu">
+                <!-- 饮品菜单项将由JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="section-title">🍰 精美糕点</div>
+            <div class="menu-grid" id="desserts-menu">
+                <!-- 糕点菜单项将由JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <div class="cart-section">
+            <div class="cart-title">🛒 当前订单</div>
+            <div id="cart-items">
+                <div class="empty-cart">购物车为空，快来选择您喜欢的商品吧！</div>
+            </div>
+            <div class="cart-total" id="cart-total" style="display: none;">
+                <div class="total-amount">总计: ¥<span id="total-amount">0</span></div>
+                <div class="action-buttons">
+                    <button class="clear-cart" onclick="clearCart()">清空购物车</button>
+                    <button class="print-order" onclick="printOrder()">打印订单</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 打印区域 -->
+    <div class="print-section" style="display: none;" id="print-section">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2>香浓咖啡馆</h2>
+            <p>订单小票</p>
+            <p>时间: <span id="print-time"></span></p>
+            <hr>
+        </div>
+        <div id="print-items"></div>
+        <hr>
+        <div style="text-align: right; font-weight: bold; font-size: 1.2em;">
+            总计: ¥<span id="print-total"></span>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <p>谢谢惠顾！欢迎下次光临！</p>
+        </div>
+    </div>
+
+    <script>
+        // 菜单数据
+        const menuData = {
+            coffee: [
+                { id: 1, name: "美式咖啡", description: "经典黑咖啡，口感醇厚", price: 25 },
+                { id: 2, name: "拿铁咖啡", description: "咖啡与牛奶的完美融合", price: 32 },
+                { id: 3, name: "卡布奇诺", description: "浓郁咖啡配绵密奶泡", price: 30 },
+                { id: 4, name: "摩卡咖啡", description: "咖啡巧克力双重享受", price: 35 },
+                { id: 5, name: "焦糖玛奇朵", description: "香甜焦糖与咖啡的邂逅", price: 38 },
+                { id: 6, name: "冰美式", description: "夏日必备，清爽醒神", price: 28 }
+            ],
+            drinks: [
+                { id: 7, name: "柠檬蜂蜜茶", description: "清香柠檬配天然蜂蜜", price: 22 },
+                { id: 8, name: "芒果气泡水", description: "新鲜芒果制作，清爽怡人", price: 26 },
+                { id: 9, name: "奶昔系列", description: "香草/草莓/巧克力可选", price: 30 },
+                { id: 10, name: "鲜榨橙汁", description: "当日新鲜橙子榨制", price: 20 },
+                { id: 11, name: "抹茶拿铁", description: "日式抹茶与牛奶调制", price: 33 },
+                { id: 12, name: "红茶拿铁", description: "英式红茶配香滑奶泡", price: 28 }
+            ],
+            desserts: [
+                { id: 13, name: "提拉米苏", description: "意式经典甜品", price: 35 },
+                { id: 14, name: "芝士蛋糕", description: "浓郁芝士香味", price: 32 },
+                { id: 15, name: "巧克力布朗尼", description: "浓郁巧克力，温热享用", price: 28 },
+                { id: 16, name: "马卡龙", description: "法式精致小点心(3个装)", price: 25 },
+                { id: 17, name: "司康饼", description: "英式下午茶必备", price: 18 },
+                { id: 18, name: "可颂面包", description: "法式酥脆可颂", price: 15 }
+            ]
+        };
+
+        // 购物车数据
+        let cart = [];
+        let quantities = {};
+
+        // 初始化数量
+        Object.values(menuData).flat().forEach(item => {
+            quantities[item.id] = 0;
+        });
+
+        // 生成菜单项HTML
+        function createMenuItem(item) {
+            return `
+                <div class="menu-item">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-description">${item.description}</div>
+                    <div class="item-price">¥${item.price}</div>
+                    <div class="quantity-control">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                        <span class="quantity-display" id="qty-${item.id}">0</span>
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    </div>
+                    <button class="add-to-cart" onclick="addToCart(${item.id})">加入购物车</button>
+                </div>
+            `;
+        }
+
+        // 更新数量
+        function updateQuantity(itemId, change) {
+            quantities[itemId] = Math.max(0, quantities[itemId] + change);
+            document.getElementById(`qty-${itemId}`).textContent = quantities[itemId];
+        }
+
+        // 添加到购物车
+        function addToCart(itemId) {
+            const quantity = quantities[itemId];
+            if (quantity === 0) {
+                alert('请先选择数量！');
+                return;
+            }
+
+            const item = Object.values(menuData).flat().find(item => item.id === itemId);
+            const existingItem = cart.find(cartItem => cartItem.id === itemId);
+
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    ...item,
+                    quantity: quantity
+                });
+            }
+
+            // 重置数量选择器
+            quantities[itemId] = 0;
+            document.getElementById(`qty-${itemId}`).textContent = 0;
+
+            updateCartDisplay();
+        }
+
+        // 更新购物车显示
+        function updateCartDisplay() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<div class="empty-cart">购物车为空，快来选择您喜欢的商品吧！</div>';
+                cartTotal.style.display = 'none';
+                return;
+            }
+
+            let total = 0;
+            cartItemsContainer.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-details">¥${item.price} × ${item.quantity}</div>
+                        </div>
+                        <div class="cart-item-price">¥${itemTotal}</div>
+                        <button class="remove-item" onclick="removeFromCart(${item.id})">删除</button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('total-amount').textContent = total;
+            cartTotal.style.display = 'block';
+        }
+
+        // 从购物车移除商品
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCartDisplay();
+        }
+
+        // 清空购物车
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (confirm('确定要清空购物车吗？')) {
+                cart = [];
+                updateCartDisplay();
+            }
+        }
+
+        // 打印订单
+        function printOrder() {
+            if (cart.length === 0) {
+                alert('购物车为空，无法打印订单！');
+                return;
+            }
+
+            const printSection = document.getElementById('print-section');
+            const printItems = document.getElementById('print-items');
+            const printTotal = document.getElementById('print-total');
+            const printTime = document.getElementById('print-time');
+
+            // 设置打印时间
+            printTime.textContent = new Date().toLocaleString('zh-CN');
+
+            // 生成打印内容
+            let total = 0;
+            printItems.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                return `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>${item.name} × ${item.quantity}</span>
+                        <span>¥${itemTotal}</span>
+                    </div>
+                `;
+            }).join('');
+
+            printTotal.textContent = total;
+
+            // 打印
+            window.print();
+        }
+
+        // 初始化页面
+        function initPage() {
+            // 生成咖啡菜单
+            document.getElementById('coffee-menu').innerHTML = 
+                menuData.coffee.map(createMenuItem).join('');
+
+            // 生成饮品菜单
+            document.getElementById('drinks-menu').innerHTML = 
+                menuData.drinks.map(createMenuItem).join('');
+
+            // 生成糕点菜单
+            document.getElementById('desserts-menu').innerHTML = 
+                menuData.desserts.map(createMenuItem).join('');
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
